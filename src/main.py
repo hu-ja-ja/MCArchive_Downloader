@@ -9,6 +9,51 @@ import argparse  # argparseを追加
 from utils.api import get_mods_by_version, get_latest_mod_download_url, get_all_mod_download_urls
 from utils.downloader import download_mod
 
+def process_mods(mod_slugs, game_version, download_directory=None, list_urls=False):
+    """
+    Process mods by either listing URLs or downloading them.
+
+    Args:
+        mod_slugs (list): List of mod slugs.
+        game_version (str): The game version to fetch mods for.
+        download_directory (str): Directory to download mods to (if applicable).
+        list_urls (bool): Whether to list URLs instead of downloading.
+
+    Returns:
+        None
+    """
+    mediafire_warnings = []
+
+    for i, slug in enumerate(mod_slugs):
+        if i > 0 and i % 20 == 0:
+            print("Rate limit reached. Waiting for 1 minute...")
+            time.sleep(60)
+
+        print(f"Fetching latest download URL for mod: {slug}")
+        try:
+            mod_url = get_latest_mod_download_url(slug, game_version)
+        except ValueError as e:
+            print(f"\033[91mError: {e}\033[0m")
+            continue
+
+        if mod_url:
+            if list_urls:
+                print(mod_url)
+            elif "mediafire.com" in mod_url:
+                mediafire_warnings.append(f"{slug}: {mod_url}")
+            else:
+                print(f"Downloading mod from: {mod_url}")
+                download_mod(mod_url, download_directory)
+        else:
+            print(f"\033[93mWarning: Download URL not found for mod: {slug}\033[0m")
+
+        time.sleep(3)
+
+    if mediafire_warnings:
+        print("\n\033[93mMediaFire links detected. These may require manual download:\033[0m")
+        for warning in mediafire_warnings:
+            print(f"\033[93m{warning}\033[0m")
+
 def main():
     parser = argparse.ArgumentParser(
         description="MCArchive Downloader",
@@ -38,13 +83,7 @@ def main():
 
     if args.url:
         print("Listing all mod URLs:")
-        for slug in mod_slugs:
-            try:
-                url = get_latest_mod_download_url(slug, game_version)
-                if url:
-                    print(url)
-            except ValueError as e:
-                print(f"\033[91mError: {e}\033[0m")
+        process_mods(mod_slugs, game_version, list_urls=True)
         return
 
     if args.download:
@@ -53,35 +92,7 @@ def main():
         if not os.path.exists(download_directory):
             os.makedirs(download_directory)
 
-        mediafire_warnings = []
-
-        for i, slug in enumerate(mod_slugs):
-            if i > 0 and i % 20 == 0:
-                print("Rate limit reached. Waiting for 1 minute...")
-                time.sleep(60)
-
-            print(f"Fetching latest download URL for mod: {slug}")
-            try:
-                mod_url = get_latest_mod_download_url(slug, game_version)
-            except ValueError as e:
-                print(f"\033[91mError: {e}\033[0m")
-                continue
-
-            if mod_url:
-                if "mediafire.com" in mod_url:
-                    mediafire_warnings.append(f"{slug}: {mod_url}")
-                else:
-                    print(f"Downloading mod from: {mod_url}")
-                    download_mod(mod_url, download_directory)
-            else:
-                print(f"\033[93mWarning: Download URL not found for mod: {slug}\033[0m")
-
-            time.sleep(3)
-
-        if mediafire_warnings:
-            print("\n\033[93mMediaFire links detected. These may require manual download:\033[0m")
-            for warning in mediafire_warnings:
-                print(f"\033[93m{warning}\033[0m")
+        process_mods(mod_slugs, game_version, download_directory=download_directory)
 
         print("Download completed.")
 
