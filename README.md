@@ -5,7 +5,7 @@ This project is a Python script designed to download mods from the Minecraft Arc
 ## Project Structure
 
 ```
-mod-downloader
+MCArchive_Downloader
 ├── src
 │   ├── main.py          # Entry point of the application
 │   └── utils
@@ -34,11 +34,16 @@ python src/main.py <game_version> <download_directory>
 
 3. Replace `<game_version>` with the desired game version (e.g., `b1.3_01`) and `<download_directory>` with the path to the directory where mods should be saved.
 
+### Notes:
+- The script will pause for 1 minute after every 20 mods to respect rate limits.
+- If a mod's download URL points to MediaFire, a warning will be displayed, and you may need to download the file manually.
+- Each mod download is followed by a 3-second delay to avoid overwhelming the server.
+
 ## Functions
 
 - **get_mods_by_version(version)**: Fetches the list of mods available for the specified game version.
 - **get_mod_download_url(slug, version)**: Retrieves the direct download URL for a mod based on its slug and game version.
-- **download_mod(url, directory)**: Downloads the mod file from the provided URL and saves it to the specified directory.
+- **download_mod(url, directory)**: Downloads the mod file from the provided URL and saves it to the specified directory. Automatically creates the directory if it does not exist.
 
 ## Contributing
 
