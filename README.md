@@ -1,6 +1,6 @@
-# Mod Downloader
+# MCArchive_Downloader
 
-This project is a Python script designed to download mods from the Minecraft Archive API. It allows users to specify a game version and download the corresponding mods to a designated directory.
+This project is a Python script designed to download mods from the [MCArchive API](https://mcarchive.net/api/v1/). It allows users to specify a game version and download the corresponding mods to a designated directory.
 
 ## Project Structure
 
