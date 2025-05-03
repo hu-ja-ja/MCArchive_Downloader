@@ -29,7 +29,8 @@ def process_mods(mod_slugs, game_version, download_directory=None, list_urls=Fal
             print("Rate limit reached. Waiting for 1 minute...")
             time.sleep(60)
 
-        print(f"Fetching latest download URL for mod: {slug}")
+        if not list_urls:
+            print(f"Fetching latest download URL for mod: {slug}")
         try:
             mod_url = get_latest_mod_download_url(slug, game_version)
         except ValueError as e:
