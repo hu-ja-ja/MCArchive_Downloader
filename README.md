@@ -4,7 +4,7 @@ This project is a Python script designed to download mods from the [MCArchive AP
 
 ## Project Structure
 
-```
+```text
 MCArchive_Downloader
 ├── src
 │   ├── main.py          # Entry point of the application
@@ -25,7 +25,7 @@ Please use with caution and perform your own testing and validation before relyi
 
 To install the required dependencies, run:
 
-```
+```shell
 pip install -r requirements.txt
 ```
 
@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 ### Download Mods
 
-```
+```shell
 python src/main.py --download <game_version> <download_directory>
 ```
 
@@ -45,13 +45,14 @@ python src/main.py --download <game_version> <download_directory>
 
 ### List Mod URLs
 
-```
+```shell
 python src/main.py --url <game_version>
 ```
 
 - Replace `<game_version>` with the desired game version (e.g., `b1.7_01`).
 
-### Notes:
+### Notes
+
 - The script will pause for 1 minute after every 20 mods to respect rate limits.
 - If a mod's download URL points to MediaFire, a warning will be displayed, and you may need to download the file manually.
 - Each mod download is followed by a 3-second delay to avoid overwhelming the server.
