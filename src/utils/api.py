@@ -59,7 +59,8 @@ def get_all_mod_download_urls(slug, version):
     for mod_version in mod_data.get("mod_versions", []):
         if any(gv.get("name") == version for gv in mod_version.get("game_versions", [])):
             for file in mod_version.get("files", []):
-                if "doc" not in file["name"].lower():
+                # Exclude files containing "doc" or "bundle" (case-insensitive)
+                if not any(keyword in file["name"].lower() for keyword in ["doc", "bundle"]):
                     if file.get("direct_url"):
                         urls.append(file["direct_url"])
                     elif file.get("archive_url"):
@@ -70,3 +71,31 @@ def get_all_mod_download_urls(slug, version):
     if not urls:
         print(f"\033[93mWarning: No valid download URLs found for the specified mod and version.\033[0m")
     return urls
+
+def get_latest_mod_download_url(slug, version):
+    version = str(version)
+    response = requests.get(f"{API_BASE_URL}mods/by_slug/{slug}")
+    response.raise_for_status()
+    mod_data = response.json()
+
+    if not mod_data.get("mod_versions", []):
+        raise ValueError(f"No mod versions found for slug: {slug}")
+
+    latest_file = None
+    for mod_version in mod_data.get("mod_versions", []):
+        if any(gv.get("name") == version for gv in mod_version.get("game_versions", [])):
+            for file in mod_version.get("files", []):
+                # Exclude files containing "doc" or "bundle" (case-insensitive)
+                if not any(keyword in file["name"].lower() for keyword in ["doc", "bundle"]):
+                    latest_file = file  # Overwrite to always get the last file
+
+    if latest_file:
+        if latest_file.get("direct_url"):
+            return latest_file["direct_url"]
+        elif latest_file.get("archive_url"):
+            return latest_file["archive_url"]
+        elif latest_file.get("redirect_url"):
+            return latest_file["redirect_url"]
+
+    print(f"\033[93mWarning: No valid download URL found for the specified mod and version.\033[0m")
+    return None

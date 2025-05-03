@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import argparse  # argparseを追加
-from utils.api import get_mods_by_version, get_mod_download_url, get_all_mod_download_urls
+from utils.api import get_mods_by_version, get_latest_mod_download_url, get_all_mod_download_urls
 from utils.downloader import download_mod
 
 def main():
@@ -40,8 +40,8 @@ def main():
         print("Listing all mod URLs:")
         for slug in mod_slugs:
             try:
-                urls = get_all_mod_download_urls(slug, game_version)
-                for url in urls:
+                url = get_latest_mod_download_url(slug, game_version)
+                if url:
                     print(url)
             except ValueError as e:
                 print(f"\033[91mError: {e}\033[0m")
@@ -60,9 +60,9 @@ def main():
                 print("Rate limit reached. Waiting for 1 minute...")
                 time.sleep(60)
 
-            print(f"Fetching download URL for mod: {slug}")
+            print(f"Fetching latest download URL for mod: {slug}")
             try:
-                mod_url = get_mod_download_url(slug, game_version)
+                mod_url = get_latest_mod_download_url(slug, game_version)
             except ValueError as e:
                 print(f"\033[91mError: {e}\033[0m")
                 continue
