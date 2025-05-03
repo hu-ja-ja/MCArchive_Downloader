@@ -4,20 +4,28 @@
 
 import os
 import sys
-import time  # 追加
-from utils.api import get_mods_by_version, get_mod_download_url
+import time
+import argparse  # argparseを追加
+from utils.api import get_mods_by_version, get_mod_download_url, get_all_mod_download_urls
 from utils.downloader import download_mod
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python main.py <game_version> <download_directory>")
+    parser = argparse.ArgumentParser(
+        description="MCArchive Downloader",
+        epilog="Example usage: python src/main.py --download b1.7_01 ./mods"
+    )
+    parser.add_argument("--download", action="store_true", help="Download mods for the specified game version and save them to the specified directory.")
+    parser.add_argument("--url", action="store_true", help="List all mod URLs for the specified game version.")
+    parser.add_argument("game_version", type=str, help="The game version to fetch mods for (e.g., b1.7_01).")
+    parser.add_argument("download_directory", type=str, nargs="?", help="The directory to download mods to (required for --download).")
+
+    args = parser.parse_args()
+
+    if args.download and not args.download_directory:
+        print("Error: --download requires a download directory to be specified.")
         sys.exit(1)
 
-    game_version = sys.argv[1]
-    download_directory = sys.argv[2]
-
-    if not os.path.exists(download_directory):
-        os.makedirs(download_directory)
+    game_version = args.game_version
 
     print(f"Fetching mods for version: {game_version}")
     try:
@@ -28,41 +36,54 @@ def main():
 
     print(f"Mod slugs fetched: {mod_slugs}")
 
-    mediafire_warnings = []  # MediaFireリンクの警告を格納するリスト
+    if args.url:
+        print("Listing all mod URLs:")
+        for slug in mod_slugs:
+            try:
+                urls = get_all_mod_download_urls(slug, game_version)
+                for url in urls:
+                    print(url)
+            except ValueError as e:
+                print(f"\033[91mError: {e}\033[0m")
+        return
 
-    for i, slug in enumerate(mod_slugs):
-        # 20件ごとに1分間待機
-        if i > 0 and i % 20 == 0:
-            print("Rate limit reached. Waiting for 1 minute...")
-            time.sleep(60)
+    if args.download:
+        download_directory = args.download_directory
 
-        print(f"Fetching download URL for mod: {slug}")
-        try:
-            mod_url = get_mod_download_url(slug, game_version)  # 修正: 完全なダウンロードURLを取得
-        except ValueError as e:
-            print(f"\033[91mError: {e}\033[0m")
-            continue
+        if not os.path.exists(download_directory):
+            os.makedirs(download_directory)
 
-        if mod_url:  # URLが取得できた場合のみダウンロード
-            if "mediafire.com" in mod_url:
-                mediafire_warnings.append(f"{slug}: {mod_url}")  # 警告をリストに追加
+        mediafire_warnings = []
+
+        for i, slug in enumerate(mod_slugs):
+            if i > 0 and i % 20 == 0:
+                print("Rate limit reached. Waiting for 1 minute...")
+                time.sleep(60)
+
+            print(f"Fetching download URL for mod: {slug}")
+            try:
+                mod_url = get_mod_download_url(slug, game_version)
+            except ValueError as e:
+                print(f"\033[91mError: {e}\033[0m")
+                continue
+
+            if mod_url:
+                if "mediafire.com" in mod_url:
+                    mediafire_warnings.append(f"{slug}: {mod_url}")
+                else:
+                    print(f"Downloading mod from: {mod_url}")
+                    download_mod(mod_url, download_directory)
             else:
-                print(f"Downloading mod from: {mod_url}")
-                download_mod(mod_url, download_directory)
-        else:
-            # URLが見つからなかった場合の警告を黄色で表示
-            print(f"\033[93mWarning: Download URL not found for mod: {slug}\033[0m")
+                print(f"\033[93mWarning: Download URL not found for mod: {slug}\033[0m")
 
-        # 各リクエスト間に少し待機
-        time.sleep(3)  # 3秒待機
+            time.sleep(3)
 
-    # MediaFireリンクの警告を最後にまとめて表示
-    if mediafire_warnings:
-        print("\n\033[93mMediaFire links detected. These may require manual download:\033[0m")
-        for warning in mediafire_warnings:
-            print(f"\033[93m{warning}\033[0m")
+        if mediafire_warnings:
+            print("\n\033[93mMediaFire links detected. These may require manual download:\033[0m")
+            for warning in mediafire_warnings:
+                print(f"\033[93m{warning}\033[0m")
 
-    print("Download completed.")
+        print("Download completed.")
 
 if __name__ == "__main__":
     main()

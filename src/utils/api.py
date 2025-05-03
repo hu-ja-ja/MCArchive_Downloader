@@ -45,3 +45,28 @@ def get_mod_download_url(slug, version):
     # 一致するURLが見つからなかった場合
     print(f"\033[93mWarning: No valid download URL found for the specified mod and version.\033[0m")
     return None
+
+def get_all_mod_download_urls(slug, version):
+    version = str(version)
+    response = requests.get(f"{API_BASE_URL}mods/by_slug/{slug}")
+    response.raise_for_status()
+    mod_data = response.json()
+
+    if not mod_data.get("mod_versions", []):
+        raise ValueError(f"No mod versions found for slug: {slug}")
+
+    urls = []
+    for mod_version in mod_data.get("mod_versions", []):
+        if any(gv.get("name") == version for gv in mod_version.get("game_versions", [])):
+            for file in mod_version.get("files", []):
+                if "doc" not in file["name"].lower():
+                    if file.get("direct_url"):
+                        urls.append(file["direct_url"])
+                    elif file.get("archive_url"):
+                        urls.append(file["archive_url"])
+                    elif file.get("redirect_url"):
+                        urls.append(file["redirect_url"])
+
+    if not urls:
+        print(f"\033[93mWarning: No valid download URLs found for the specified mod and version.\033[0m")
+    return urls
