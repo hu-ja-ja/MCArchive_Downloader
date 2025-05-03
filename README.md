@@ -21,9 +21,9 @@ Some or all of the code in this repository was generated using GitHub Copilot (q
 It has **not been manually reviewed, tested, or modified**.
 Please use with caution and perform your own testing and validation before relying on it in production or critical environments.
 
-## Installation
+## ~~Installation~~
 
-To install the required dependencies, run:
+~~To install the required dependencies, run:~~
 
 ```
 pip install -r requirements.txt
@@ -38,7 +38,7 @@ pip install -r requirements.txt
 python src/main.py <game_version> <download_directory>
 ```
 
-3. Replace `<game_version>` with the desired game version (e.g., `b1.3_01`) and `<download_directory>` with the path to the directory where mods should be saved.
+3. Replace `<game_version>` with the desired game version (e.g., `b1.7_01`) and `"<download_directory>"` with the path to the directory where mods should be saved.
 
 ### Notes:
 - The script will pause for 1 minute after every 20 mods to respect rate limits.
