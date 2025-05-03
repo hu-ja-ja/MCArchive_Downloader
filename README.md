@@ -15,6 +15,12 @@ MCArchive_Downloader
 └── README.md            # Project documentation
 ```
 
+## AI-Generated Code Notice
+
+Some or all of the code in this repository was generated using GitHub Copilot (qwen2.5-coder:7b & GPT-4o).
+It has **not been manually reviewed, tested, or modified**.
+Please use with caution and perform your own testing and validation before relying on it in production or critical environments.
+
 ## Installation
 
 To install the required dependencies, run:
