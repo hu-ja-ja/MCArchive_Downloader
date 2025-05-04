@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import argparse
-from utils.api import get_mods_by_version, get_latest_mod_download_url, get_all_mod_download_urls
+from utils.api import get_mods_by_version, get_all_mod_download_urls
 from utils.downloader import download_mod
 
 def process_mods(mod_slugs, game_version, download_directory=None, list_urls=False):
