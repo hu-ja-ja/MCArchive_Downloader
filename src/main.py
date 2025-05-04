@@ -23,6 +23,7 @@ def process_mods(mod_slugs, game_version, download_directory=None, list_urls=Fal
         None
     """
     mediafire_warnings = []
+    all_urls = []
 
     for i, slug in enumerate(mod_slugs):
         if i > 0 and i % 20 == 0:
@@ -39,6 +40,7 @@ def process_mods(mod_slugs, game_version, download_directory=None, list_urls=Fal
 
         if mod_urls:
             for mod_url in mod_urls:
+                all_urls.append(mod_url)
                 if list_urls:
                     print(mod_url)
                 elif "mediafire.com" in mod_url:
@@ -49,6 +51,11 @@ def process_mods(mod_slugs, game_version, download_directory=None, list_urls=Fal
                 time.sleep(3)  # Wait 3 seconds between downloads
         else:
             print(f"\033[93mWarning: Download URLs not found for mod: {slug}\033[0m")
+
+    if list_urls:
+        print("\nAll URLs:")
+        for url in all_urls:
+            print(url)
 
     if mediafire_warnings:
         print("\n\033[93mMediaFire links detected. These may require manual download:\033[0m")
@@ -83,7 +90,6 @@ def main():
     print(f"Mod slugs fetched: {mod_slugs}")
 
     if args.url:
-        print("Listing all mod URLs:")
         process_mods(mod_slugs, game_version, list_urls=True)
         return
 
