@@ -30,25 +30,25 @@ def process_mods(mod_slugs, game_version, download_directory=None, list_urls=Fal
             time.sleep(60)
 
         if not list_urls:
-            print(f"Fetching latest download URL for mod: {slug}")
+            print(f"Fetching all download URLs for mod: {slug}")
         try:
-            mod_url = get_latest_mod_download_url(slug, game_version)
+            mod_urls = get_all_mod_download_urls(slug, game_version)
         except ValueError as e:
             print(f"\033[91mError: {e}\033[0m")
             continue
 
-        if mod_url:
-            if list_urls:
-                print(mod_url)
-            elif "mediafire.com" in mod_url:
-                mediafire_warnings.append(f"{slug}: {mod_url}")
-            else:
-                print(f"Downloading mod from: {mod_url}")
-                download_mod(mod_url, download_directory)
+        if mod_urls:
+            for mod_url in mod_urls:
+                if list_urls:
+                    print(mod_url)
+                elif "mediafire.com" in mod_url:
+                    mediafire_warnings.append(f"{slug}: {mod_url}")
+                else:
+                    print(f"Downloading mod from: {mod_url}")
+                    download_mod(mod_url, download_directory)
+                time.sleep(3)  # Wait 3 seconds between downloads
         else:
-            print(f"\033[93mWarning: Download URL not found for mod: {slug}\033[0m")
-
-        time.sleep(3)
+            print(f"\033[93mWarning: Download URLs not found for mod: {slug}\033[0m")
 
     if mediafire_warnings:
         print("\n\033[93mMediaFire links detected. These may require manual download:\033[0m")
