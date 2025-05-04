@@ -5,7 +5,7 @@
 import os
 import sys
 import time
-import argparse  # argparseを追加
+import argparse
 from utils.api import get_mods_by_version, get_latest_mod_download_url, get_all_mod_download_urls
 from utils.downloader import download_mod
 
@@ -48,7 +48,7 @@ def process_mods(mod_slugs, game_version, download_directory=None, list_urls=Fal
                 else:
                     print(f"Downloading mod from: {mod_url}")
                     download_mod(mod_url, download_directory)
-                time.sleep(3)  # Wait 3 seconds between downloads
+                time.sleep(3)
         else:
             print(f"\033[93mWarning: Download URLs not found for mod: {slug}\033[0m")
 

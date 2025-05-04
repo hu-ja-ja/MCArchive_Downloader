@@ -7,13 +7,11 @@ import requests
 API_BASE_URL = "https://mcarchive.net/api/v1/"
 
 def get_mods_by_version(version):
-    # versionを文字列として扱う
     version = str(version)
     response = requests.get(f"{API_BASE_URL}mods/?game_version={version}")
-    response.raise_for_status()  # Raise an error for bad responses
+    response.raise_for_status()
     mods = response.json()
 
-    # データが空の場合にエラーを返す
     if not mods:
         raise ValueError(f"No mods found for game version: {version}")
 
