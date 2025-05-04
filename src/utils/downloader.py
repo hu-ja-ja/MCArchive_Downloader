@@ -4,6 +4,7 @@
 
 import os
 import requests
+import urllib.parse
 
 def download_mod(url, directory):
     if not os.path.exists(directory):
@@ -11,7 +12,7 @@ def download_mod(url, directory):
 
     response = requests.get(url, stream=True)
     if response.status_code == 200:
-        file_name = url.split('/')[-1]
+        file_name = urllib.parse.unquote(url.split('/')[-1])
         file_path = os.path.join(directory, file_name)
 
         with open(file_path, 'wb') as file:
